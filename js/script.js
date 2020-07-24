@@ -11,13 +11,72 @@
 // Consigli e domande del giorno:
 // Abbiamo visto assieme una libereria che serve per gestire le date... quale sarà?
 // Una chiamata ajax può anche non andare a buon fine, che si fa in quel caso? Lasciamo l'utente ad attendere? ;)
+// API: https://flynn.boolean.careers/exercises/api/holidays
 
 // Area init
 
 function init() {
+  var currentMonth = moment("2018-01-01");
 
+  printMonth(currentMonth);
+  printHoliday(currentMonth);
 }
 
 $(document).ready(init);
 
 // Area funzioni
+
+function printMonth(currentMonth) {
+  var daysInMonth = currentMonth.daysInMonth();
+  var template = $('#template').html();
+  var compiled = Handlebars.compile(template);
+  var target = $('.month-calendar');
+
+  target.html('');
+
+  for (var i = 1; i <= daysInMonth; i++) {
+    var fullDate = moment({
+      year: currentMonth.year(),
+      month: currentMonth.month(),
+      day: i
+    });
+    var daysHTML = compiled({
+      'value': i,
+      'fulldate': fullDate.format("YYYY-MM-DD")
+    });
+    target.append(daysHTML);
+  }
+}
+
+function printHoliday(currentMonth) {
+  var year = currentMonth.year();
+  var month = currentMonth.month();
+  
+  $.ajax({
+    url: 'https://flynn.boolean.careers/exercises/api/holidays',
+    method: 'GET',
+    data: {
+      'year': year,
+      'month': month
+    },
+    success: function(data) {
+      var success = data['success'];
+      var holidays = data['response'];
+      if (success) {
+        for (var i = 0; i < holidays.length; i++) {
+          var element = $("#month-calendar li[data-fulldate='" + holidays[i]["date"] + "']")
+          element.addClass('holidays');
+          element.append(' ' + holidays[i]['name']);
+        }
+      } else {
+        console.log('error');
+      }
+    },
+    error: function(request, state, error) {
+      console.log('request', request);
+      console.log('state', state);
+      console.log('error', error);
+    }
+  });
+
+}
