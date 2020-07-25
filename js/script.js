@@ -13,18 +13,59 @@
 // Una chiamata ajax può anche non andare a buon fine, che si fa in quel caso? Lasciamo l'utente ad attendere? ;)
 // API: https://flynn.boolean.careers/exercises/api/holidays
 
+// Var globali
+
+var activeMonth = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+var titleMonth = ["Gennaio 2018", "Febbraio 2018", "Marzo 2018", "Aprile 2018", "Maggio 2018", "Giugno 2018", "Luglio 2018", "Agosto 2018", "Settembre 2018", "Ottobre 2018", "Novembre 2018", "Dicembre 2018"];
+var i = 0;
+var currentMonth = moment("2018-" + activeMonth[i] + "-01");
+
 // Area init
 
 function init() {
-  var currentMonth = moment("2018-01-01");
 
   printMonth(currentMonth);
   printHoliday(currentMonth);
+  addMonthListener();
 }
 
 $(document).ready(init);
 
 // Area funzioni
+
+function addMonthListener() {
+  var leftArrow = $('#left-arrow');
+  var rightArrow = $('#right-arrow');
+  leftArrow.click(prevMonth);
+  rightArrow.click(nextMonth);
+}
+
+function prevMonth() {
+  i--;
+  if (i < 0) {
+    i = 0;
+    alert("Sono presenti solo le festività da Gennaio 2018 a Dicembre 2018!");
+  } else {
+    currentMonth = moment("2018-" + activeMonth[i] + "-01");
+    printMonth(currentMonth);
+    printHoliday(currentMonth);
+    $('#month-title').text(titleMonth[i]);
+  }
+}
+
+function nextMonth() {
+  i++;
+  if (i < 12) {
+    currentMonth = moment("2018-" + activeMonth[i] + "-01");
+    printMonth(currentMonth);
+    printHoliday(currentMonth);
+    $('#month-title').text(titleMonth[i]);
+    console.log(i);
+  } else {
+    i = 11;
+    alert("Sono presenti solo le festività da Gennaio 2018 a Dicembre 2018!");
+  }
+}
 
 function printMonth(currentMonth) {
   var daysInMonth = currentMonth.daysInMonth();
@@ -51,7 +92,7 @@ function printMonth(currentMonth) {
 function printHoliday(currentMonth) {
   var year = currentMonth.year();
   var month = currentMonth.month();
-  
+
   $.ajax({
     url: 'https://flynn.boolean.careers/exercises/api/holidays',
     method: 'GET',
