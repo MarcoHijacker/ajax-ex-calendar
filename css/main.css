@@ -48,3 +48,6 @@ ul.month-calendar li {
   font-weight: 600;
   margin: 10px;
 }
+#left-arrow, #right-arrow {
+  cursor: pointer;
+}
